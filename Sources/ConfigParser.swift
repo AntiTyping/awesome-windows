@@ -27,15 +27,9 @@ enum ConfigParser {
                 continue
             }
 
-            guard let rawApps = entry["apps"] as? [Any], !rawApps.isEmpty else {
-                warnings.append("Set '\(name)': missing or empty 'apps', skipping")
-                continue
-            }
-
-            let appTargets = parseAppTargets(rawApps, setName: name, warnings: &warnings)
-            guard !appTargets.isEmpty else {
-                warnings.append("Set '\(name)': no valid app entries, skipping")
-                continue
+            var appTargets: [AppTarget] = []
+            if let rawApps = entry["apps"] as? [Any] {
+                appTargets = parseAppTargets(rawApps, setName: name, warnings: &warnings)
             }
 
             guard let hotkey = HotkeyBinding(from: hotkeyStr) else {
@@ -63,7 +57,15 @@ enum ConfigParser {
             print("[AwesomeWindows] Warning: \(warning)")
         }
 
-        return AppConfig(sets: filteredSets)
+        var addHotkey: HotkeyBinding? = nil
+        if let addHotkeyStr = root["add_hotkey"] as? String {
+            addHotkey = HotkeyBinding(from: addHotkeyStr)
+            if addHotkey == nil {
+                print("[AwesomeWindows] Warning: invalid add_hotkey '\(addHotkeyStr)', ignoring")
+            }
+        }
+
+        return AppConfig(sets: filteredSets, addHotkey: addHotkey)
     }
 
     private static func parseAppTargets(_ rawApps: [Any], setName: String, warnings: inout [String]) -> [AppTarget] {
@@ -88,17 +90,36 @@ enum ConfigParser {
 
     static var defaultConfigYAML: String {
         """
+        add_hotkey: ctrl+cmd+a
+
         sets:
-          coding:
+          1:
             hotkey: ctrl+cmd+1
-            apps:
-              - com.apple.Terminal
-              - com.apple.Safari
-          communication:
+            apps: []
+          2:
             hotkey: ctrl+cmd+2
-            apps:
-              - com.apple.mail
-              - com.apple.iCal
+            apps: []
+          3:
+            hotkey: ctrl+cmd+3
+            apps: []
+          4:
+            hotkey: ctrl+cmd+4
+            apps: []
+          5:
+            hotkey: ctrl+cmd+5
+            apps: []
+          6:
+            hotkey: ctrl+cmd+6
+            apps: []
+          7:
+            hotkey: ctrl+cmd+7
+            apps: []
+          8:
+            hotkey: ctrl+cmd+8
+            apps: []
+          9:
+            hotkey: ctrl+cmd+9
+            apps: []
         """
     }
 }

@@ -87,21 +87,36 @@ struct ConfigParserTests {
         #expect(config.sets[0].name == "valid")
     }
 
-    @Test("skips set with missing apps")
-    func skipMissingApps() throws {
+    @Test("allows set with no apps key (empty workspace)")
+    func allowEmptyApps() throws {
         let yaml = """
         sets:
-          noapps:
+          empty:
             hotkey: ctrl+cmd+1
-          valid:
+          withapps:
             hotkey: ctrl+cmd+2
             apps:
               - com.apple.Safari
         """
 
         let config = try ConfigParser.parse(yaml: yaml)
+        #expect(config.sets.count == 2)
+        let empty = config.sets.first(where: { $0.name == "empty" })!
+        #expect(empty.apps.isEmpty)
+    }
+
+    @Test("allows set with empty apps array")
+    func allowEmptyAppsArray() throws {
+        let yaml = """
+        sets:
+          workspace:
+            hotkey: ctrl+cmd+1
+            apps: []
+        """
+
+        let config = try ConfigParser.parse(yaml: yaml)
         #expect(config.sets.count == 1)
-        #expect(config.sets[0].name == "valid")
+        #expect(config.sets[0].apps.isEmpty)
     }
 
     @Test("skips sets with duplicate hotkeys")

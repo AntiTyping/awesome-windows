@@ -19,6 +19,8 @@ mkdir -p "$APP_DIR/Contents/Resources"
 cp "$BUILD_DIR/debug/AwesomeWindows" "$APP_DIR/Contents/MacOS/AwesomeWindows"
 cp "$PROJECT_DIR/Sources/Info.plist" "$APP_DIR/Contents/Info.plist"
 
+codesign --force --sign - --identifier "$BUNDLE_ID" "$APP_DIR"
+
 echo "Built: $APP_DIR"
 echo ""
 echo "Run with:"

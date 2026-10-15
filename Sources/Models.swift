@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 struct HotkeyBinding: Equatable {
@@ -25,6 +26,12 @@ struct AppTarget {
     let titleFilter: String?
 }
 
+struct TrackedWindow: Equatable {
+    let windowID: CGWindowID
+    let bundleID: String
+    let displayName: String
+}
+
 struct WindowSet {
     let name: String
     let hotkey: HotkeyBinding
@@ -33,6 +40,7 @@ struct WindowSet {
 
 struct AppConfig {
     let sets: [WindowSet]
+    let addHotkey: HotkeyBinding?
 
     struct ParseError: Error, CustomStringConvertible {
         let description: String

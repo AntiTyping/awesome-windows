@@ -32,13 +32,26 @@ struct MenuBarView: View {
         if let config = coordinator.configManager.config {
             Section("Sets") {
                 ForEach(config.sets, id: \.name) { set in
-                    Button("\(set.name) (\(hotkeyLabel(set.hotkey)))") {
-                        coordinator.windowManager.activateSet(set)
+                    let tracked = coordinator.trackedWindows[set.name] ?? []
+                    Button("\(set.name) (\(hotkeyLabel(set.hotkey))) — \(tracked.count)") {
+                        let t = coordinator.trackedWindows[set.name] ?? []
+                        coordinator.windowManager.activateSet(set, trackedWindows: t)
                         coordinator.activeSetName = set.name
                     }
                 }
             }
             Divider()
+
+            let windows = coordinator.activeTrackedWindows
+            if !windows.isEmpty {
+                Section("Windows in Set") {
+                    ForEach(Array(windows.enumerated()), id: \.element.windowID) { _, win in
+                        Text(win.displayName)
+                            .font(.system(.body, design: .monospaced))
+                    }
+                }
+                Divider()
+            }
         }
 
         Button("Reload Config") {

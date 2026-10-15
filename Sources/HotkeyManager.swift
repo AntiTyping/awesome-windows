@@ -47,6 +47,38 @@ final class HotkeyManager {
         }
     }
 
+    func registerHotkey(_ binding: HotkeyBinding, action: @escaping () -> Void) {
+        let id = nextId
+        nextId += 1
+
+        let hotKeyID = EventHotKeyID(signature: OSType(0x4157_494E), id: id)
+        let modifiers = carbonModifiers(from: binding.modifiers)
+        let keyCode = carbonKeyCode(from: binding.key)
+
+        guard keyCode != UInt32.max else {
+            print("[AwesomeWindows] Unknown key '\(binding.key)' for extra hotkey, skipping")
+            return
+        }
+
+        var hotKeyRef: EventHotKeyRef?
+        let status = RegisterEventHotKey(
+            keyCode,
+            modifiers,
+            hotKeyID,
+            GetApplicationEventTarget(),
+            0,
+            &hotKeyRef
+        )
+
+        if status == noErr, let ref = hotKeyRef {
+            registeredHotkeys.append((id: id, ref: ref))
+            hotkeyActions[id] = action
+            print("[AwesomeWindows] Registered add-to-set hotkey")
+        } else {
+            print("[AwesomeWindows] Failed to register add-to-set hotkey: \(status)")
+        }
+    }
+
     func unregisterAll() {
         for entry in registeredHotkeys {
             UnregisterEventHotKey(entry.ref)
